@@ -29,8 +29,14 @@ class VehicleServiceTest {
             return toSave;
         });
 
-        Vehicle created = vehicleService.create(
-                new Vehicle("Toyota", "Corolla", "Sedan", new BigDecimal("1850000.00"), 4));
+        Vehicle toCreate = new Vehicle();
+        toCreate.setMake("Toyota");
+        toCreate.setModel("Corolla");
+        toCreate.setCategory("Sedan");
+        toCreate.setPrice(new BigDecimal("1850000.00"));
+        toCreate.setQuantity(4);
+
+        Vehicle created = vehicleService.create(toCreate);
 
         assertThat(created.getId()).isNotNull();
         assertThat(created.getMake()).isEqualTo("Toyota");
