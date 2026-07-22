@@ -1,6 +1,10 @@
 package com.pranshu.car_dealership.vehicle;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -11,6 +15,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -84,6 +89,25 @@ class VehicleControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$.length()").value(0));
+    }
+
+    @Test
+    void passesSuppliedSearchParamsToServiceAndLeavesOmittedOnesNull() throws Exception {
+        when(vehicleService.search(any(), any(), any(), any(), any()))
+                .thenReturn(List.of(vehicle(1L, "Toyota", "Corolla", "Sedan", "1850000.00", 4)));
+
+        mockMvc.perform(get("/api/vehicles/search")
+                        .param("make", "Toyota")
+                        .param("minPrice", "1000000"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].make").value("Toyota"));
+
+        ArgumentCaptor<BigDecimal> minPrice = ArgumentCaptor.forClass(BigDecimal.class);
+        verify(vehicleService).search(
+                eq("Toyota"), isNull(), isNull(), minPrice.capture(), isNull());
+        assertThat(minPrice.getValue()).isEqualByComparingTo("1000000");
     }
 
     private Vehicle vehicle(Long id, String make, String model, String category, String price, int quantity) {
