@@ -169,6 +169,27 @@ class VehicleControllerTest {
                 .andExpect(jsonPath("$.message").value("Purchase quantity must be positive, but was 0"));
     }
 
+    @Test
+    void restocksVehicleAndReturns200() throws Exception {
+        when(vehicleService.restock(1L, 3))
+                .thenReturn(vehicle(1L, "Toyota", "Corolla", "Sedan", "1850000.00", 8));
+
+        mockMvc.perform(post("/api/vehicles/1/restock").param("quantity", "3"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.quantity").value(8));
+
+        verify(vehicleService).restock(1L, 3);
+    }
+
+    @Test
+    void returns404WhenRestockingVehicleThatDoesNotExist() throws Exception {
+        when(vehicleService.restock(99L, 3)).thenThrow(new VehicleNotFoundException(99L));
+
+        mockMvc.perform(post("/api/vehicles/99/restock").param("quantity", "3"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Vehicle not found with id 99"));
+    }
+
     private Vehicle vehicle(Long id, String make, String model, String category, String price, int quantity) {
         Vehicle vehicle = new Vehicle();
         vehicle.setId(id);

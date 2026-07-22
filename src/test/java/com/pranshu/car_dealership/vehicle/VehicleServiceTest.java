@@ -115,4 +115,45 @@ class VehicleServiceTest {
         verify(vehicleRepository, never()).findById(any());
         verify(vehicleRepository, never()).save(any(Vehicle.class));
     }
+
+    @Test
+    void increasesQuantityByRestockedAmount() {
+        Vehicle existing = new Vehicle();
+        existing.setId(1L);
+        existing.setMake("Toyota");
+        existing.setModel("Corolla");
+        existing.setCategory("Sedan");
+        existing.setPrice(new BigDecimal("1850000.00"));
+        existing.setQuantity(5);
+
+        when(vehicleRepository.findById(1L)).thenReturn(Optional.of(existing));
+        when(vehicleRepository.save(any(Vehicle.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Vehicle restocked = vehicleService.restock(1L, 3);
+
+        assertThat(restocked.getQuantity()).isEqualTo(8);
+
+        ArgumentCaptor<Vehicle> saved = ArgumentCaptor.forClass(Vehicle.class);
+        verify(vehicleRepository).save(saved.capture());
+        assertThat(saved.getValue().getQuantity()).isEqualTo(8);
+    }
+
+    @Test
+    void rejectsNonPositiveRestockQuantity() {
+        assertThatThrownBy(() -> vehicleService.restock(1L, 0))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        verify(vehicleRepository, never()).findById(any());
+        verify(vehicleRepository, never()).save(any(Vehicle.class));
+    }
+
+    @Test
+    void throwsWhenRestockingVehicleThatDoesNotExist() {
+        when(vehicleRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> vehicleService.restock(99L, 1))
+                .isInstanceOf(VehicleNotFoundException.class);
+
+        verify(vehicleRepository, never()).save(any(Vehicle.class));
+    }
 }

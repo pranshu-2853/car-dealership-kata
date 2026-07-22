@@ -28,11 +28,18 @@ public class VehicleService {
     }
 
     @Transactional
+    public Vehicle restock(Long id, int quantity) {
+        requirePositive(quantity, "Restock");
+        Vehicle vehicle = findOrThrow(id);
+
+        vehicle.setQuantity(vehicle.getQuantity() + quantity);
+        return repository.save(vehicle);
+    }
+
+    @Transactional
     public Vehicle purchase(Long id, int quantity) {
-        if (quantity <= 0) {
-            throw new IllegalArgumentException("Purchase quantity must be positive, but was " + quantity);
-        }
-        Vehicle vehicle = repository.findById(id).orElseThrow(() -> new VehicleNotFoundException(id));
+        requirePositive(quantity, "Purchase");
+        Vehicle vehicle = findOrThrow(id);
 
         if (vehicle.getQuantity() < quantity) {
             throw new InsufficientStockException(
@@ -42,5 +49,15 @@ public class VehicleService {
 
         vehicle.setQuantity(vehicle.getQuantity() - quantity);
         return repository.save(vehicle);
+    }
+
+    private Vehicle findOrThrow(Long id) {
+        return repository.findById(id).orElseThrow(() -> new VehicleNotFoundException(id));
+    }
+
+    private void requirePositive(int quantity, String operation) {
+        if (quantity <= 0) {
+            throw new IllegalArgumentException(operation + " quantity must be positive, but was " + quantity);
+        }
     }
 }
