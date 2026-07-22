@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import java.math.BigDecimal;
 import java.util.List;
@@ -39,5 +40,11 @@ public class VehicleController {
             @RequestParam(required = false) BigDecimal minPrice,
             @RequestParam(required = false) BigDecimal maxPrice) {
         return ResponseEntity.ok(vehicleService.search(make, model, category, minPrice, maxPrice));
+    }
+
+    @PostMapping("/{id}/purchase")
+    public ResponseEntity<Vehicle> purchase(@PathVariable Long id,
+                                            @RequestParam(defaultValue = "1") int quantity) {
+        return ResponseEntity.ok(vehicleService.purchase(id, quantity));
     }
 }

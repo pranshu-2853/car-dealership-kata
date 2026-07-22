@@ -14,8 +14,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.pranshu.car_dealership.web.GlobalExceptionHandler;
+
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.context.annotation.Import;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -24,6 +27,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(VehicleController.class)
+@Import(GlobalExceptionHandler.class)
 @AutoConfigureMockMvc(addFilters = false)
 class VehicleControllerTest {
 
@@ -108,6 +112,61 @@ class VehicleControllerTest {
         verify(vehicleService).search(
                 eq("Toyota"), isNull(), isNull(), minPrice.capture(), isNull());
         assertThat(minPrice.getValue()).isEqualByComparingTo("1000000");
+    }
+
+    @Test
+    void purchasesVehicleAndReturns200() throws Exception {
+        when(vehicleService.purchase(1L, 2))
+                .thenReturn(vehicle(1L, "Toyota", "Corolla", "Sedan", "1850000.00", 3));
+
+        mockMvc.perform(post("/api/vehicles/1/purchase").param("quantity", "2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.quantity").value(3));
+
+        verify(vehicleService).purchase(1L, 2);
+    }
+
+    @Test
+    void defaultsPurchaseQuantityToOneWhenOmitted() throws Exception {
+        when(vehicleService.purchase(1L, 1))
+                .thenReturn(vehicle(1L, "Toyota", "Corolla", "Sedan", "1850000.00", 4));
+
+        mockMvc.perform(post("/api/vehicles/1/purchase"))
+                .andExpect(status().isOk());
+
+        verify(vehicleService).purchase(1L, 1);
+    }
+
+    @Test
+    void returns409WhenStockIsInsufficient() throws Exception {
+        when(vehicleService.purchase(1L, 10))
+                .thenThrow(new InsufficientStockException(
+                        "Cannot purchase 10 units of vehicle 1; only 5 available"));
+
+        mockMvc.perform(post("/api/vehicles/1/purchase").param("quantity", "10"))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message").value(
+                        "Cannot purchase 10 units of vehicle 1; only 5 available"));
+    }
+
+    @Test
+    void returns404WhenVehicleDoesNotExist() throws Exception {
+        when(vehicleService.purchase(99L, 1)).thenThrow(new VehicleNotFoundException(99L));
+
+        mockMvc.perform(post("/api/vehicles/99/purchase"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Vehicle not found with id 99"));
+    }
+
+    @Test
+    void returns400WhenPurchaseQuantityIsNotPositive() throws Exception {
+        when(vehicleService.purchase(1L, 0))
+                .thenThrow(new IllegalArgumentException("Purchase quantity must be positive, but was 0"));
+
+        mockMvc.perform(post("/api/vehicles/1/purchase").param("quantity", "0"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Purchase quantity must be positive, but was 0"));
     }
 
     private Vehicle vehicle(Long id, String make, String model, String category, String price, int quantity) {
