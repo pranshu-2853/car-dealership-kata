@@ -66,6 +66,16 @@ concepts, and reasoning through design decisions before implementation.
 - "So the thing I need to remember here is that then answer method will grab the thing that we have passed..." [confirmed understanding of thenAnswer vs thenReturn distinction]
 - "You said that the answer will inspect and react to what was actually passed what does react mean" [asked for precision on what "react" means in thenAnswer — confirmed it means inspect + optionally mutate + return]
 
+### Search feature — repository-layer testing decision
+
+- [Asked whether Search should be tested at service, controller, or repository layer, given real filtering logic exists]
+- [Confirmed understanding: repository layer tested directly via @DataJpaTest since filtering logic lives in the JPQL query, not the service; mocked-repository service tests can't prove filtering actually works]
+- "why the case sensitivity is there why we not match the capital T with the small T" [asked why case-insensitive matching wasn't implemented; confirmed as a deliberate deferred decision, not an oversight]
+- "Today's time is 5:00 PM on 22nd July and before tomorrow 12 AM I have to submit it" [flagged real time pressure; triggered a scope/pace triage — batching remaining search filter tests, full TDD reserved for Purchase/Auth only, no frontend tests]
+- [Reviewed batched implementation of model/category/price-range filters plus the "no filters returns everything" regression test — all 4 repository tests green]
+- [Asked for detailed explanation of Mockito's all-or-nothing matcher rule (eq/isNull) and ArgumentCaptor usage for BigDecimal in the search controller test]
+- [Confirmed full test suite green — 10 tests total across VehicleServiceTest, VehicleControllerTest, VehicleRepositoryTest]
+
 ---
 
 ## Session 2: Implementation (Claude Code, in-repo)
