@@ -1,6 +1,7 @@
 package com.pranshu.car_dealership.vehicle;
 
 import jakarta.transaction.Transactional;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.List;
@@ -40,11 +41,13 @@ public class VehicleService {
         return repository.save(existing);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     public void delete(Long id) {
         repository.delete(findOrThrow(id));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     public Vehicle restock(Long id, int quantity) {
         requirePositive(quantity, "Restock");
