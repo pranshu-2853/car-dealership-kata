@@ -27,6 +27,9 @@ public class VehicleService {
     }
 
     public Vehicle purchase(Long id, int quantity) {
+        if (quantity <= 0) {
+            throw new IllegalArgumentException("Purchase quantity must be positive, but was " + quantity);
+        }
         Vehicle vehicle = repository.findById(id).orElseThrow(() -> new VehicleNotFoundException(id));
 
         if (vehicle.getQuantity() < quantity) {
