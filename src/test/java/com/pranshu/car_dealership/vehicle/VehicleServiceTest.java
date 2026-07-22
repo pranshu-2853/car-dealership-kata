@@ -117,6 +117,70 @@ class VehicleServiceTest {
     }
 
     @Test
+    void updatesAllEditableFieldsButKeepsTheOriginalId() {
+        Vehicle existing = new Vehicle();
+        existing.setId(1L);
+        existing.setMake("Toyota");
+        existing.setModel("Corolla");
+        existing.setCategory("Sedan");
+        existing.setPrice(new BigDecimal("1850000.00"));
+        existing.setQuantity(5);
+
+        Vehicle updated = new Vehicle();
+        updated.setId(999L);
+        updated.setMake("Honda");
+        updated.setModel("City");
+        updated.setCategory("Hatchback");
+        updated.setPrice(new BigDecimal("1400000.00"));
+        updated.setQuantity(2);
+
+        when(vehicleRepository.findById(1L)).thenReturn(Optional.of(existing));
+        when(vehicleRepository.save(any(Vehicle.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Vehicle result = vehicleService.update(1L, updated);
+
+        assertThat(result.getId()).isEqualTo(1L);
+        assertThat(result.getMake()).isEqualTo("Honda");
+        assertThat(result.getModel()).isEqualTo("City");
+        assertThat(result.getCategory()).isEqualTo("Hatchback");
+        assertThat(result.getPrice()).isEqualByComparingTo("1400000.00");
+        assertThat(result.getQuantity()).isEqualTo(2);
+    }
+
+    @Test
+    void throwsWhenUpdatingVehicleThatDoesNotExist() {
+        when(vehicleRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> vehicleService.update(99L, new Vehicle()))
+                .isInstanceOf(VehicleNotFoundException.class);
+
+        verify(vehicleRepository, never()).save(any(Vehicle.class));
+    }
+
+    @Test
+    void deletesExistingVehicle() {
+        Vehicle existing = new Vehicle();
+        existing.setId(1L);
+        existing.setMake("Toyota");
+
+        when(vehicleRepository.findById(1L)).thenReturn(Optional.of(existing));
+
+        vehicleService.delete(1L);
+
+        verify(vehicleRepository).delete(existing);
+    }
+
+    @Test
+    void throwsWhenDeletingVehicleThatDoesNotExist() {
+        when(vehicleRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> vehicleService.delete(99L))
+                .isInstanceOf(VehicleNotFoundException.class);
+
+        verify(vehicleRepository, never()).delete(any(Vehicle.class));
+    }
+
+    @Test
     void increasesQuantityByRestockedAmount() {
         Vehicle existing = new Vehicle();
         existing.setId(1L);

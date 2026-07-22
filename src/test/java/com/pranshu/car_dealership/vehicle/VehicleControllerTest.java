@@ -6,8 +6,11 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -167,6 +170,44 @@ class VehicleControllerTest {
         mockMvc.perform(post("/api/vehicles/1/purchase").param("quantity", "0"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Purchase quantity must be positive, but was 0"));
+    }
+
+    @Test
+    void updatesVehicleAndReturns200() throws Exception {
+        when(vehicleService.update(eq(1L), any(Vehicle.class)))
+                .thenReturn(vehicle(1L, "Honda", "City", "Hatchback", "1400000.00", 2));
+
+        String requestBody = """
+                {
+                  "make": "Honda",
+                  "model": "City",
+                  "category": "Hatchback",
+                  "price": 1400000.00,
+                  "quantity": 2
+                }
+                """;
+
+        mockMvc.perform(put("/api/vehicles/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.make").value("Honda"))
+                .andExpect(jsonPath("$.quantity").value(2));
+
+        ArgumentCaptor<Vehicle> submitted = ArgumentCaptor.forClass(Vehicle.class);
+        verify(vehicleService).update(eq(1L), submitted.capture());
+        assertThat(submitted.getValue().getMake()).isEqualTo("Honda");
+        assertThat(submitted.getValue().getQuantity()).isEqualTo(2);
+    }
+
+    @Test
+    void deletesVehicleAndReturns204() throws Exception {
+        mockMvc.perform(delete("/api/vehicles/1"))
+                .andExpect(status().isNoContent())
+                .andExpect(content().string(""));
+
+        verify(vehicleService).delete(1L);
     }
 
     @Test

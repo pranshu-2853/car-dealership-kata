@@ -28,6 +28,24 @@ public class VehicleService {
     }
 
     @Transactional
+    public Vehicle update(Long id, Vehicle updated) {
+        Vehicle existing = findOrThrow(id);
+
+        existing.setMake(updated.getMake());
+        existing.setModel(updated.getModel());
+        existing.setCategory(updated.getCategory());
+        existing.setPrice(updated.getPrice());
+        existing.setQuantity(updated.getQuantity());
+
+        return repository.save(existing);
+    }
+
+    @Transactional
+    public void delete(Long id) {
+        repository.delete(findOrThrow(id));
+    }
+
+    @Transactional
     public Vehicle restock(Long id, int quantity) {
         requirePositive(quantity, "Restock");
         Vehicle vehicle = findOrThrow(id);
