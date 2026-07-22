@@ -1,5 +1,6 @@
 package com.pranshu.car_dealership.vehicle;
 
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.List;
@@ -26,6 +27,7 @@ public class VehicleService {
         return repository.search(make, model, category, minPrice, maxPrice);
     }
 
+    @Transactional
     public Vehicle purchase(Long id, int quantity) {
         if (quantity <= 0) {
             throw new IllegalArgumentException("Purchase quantity must be positive, but was " + quantity);
