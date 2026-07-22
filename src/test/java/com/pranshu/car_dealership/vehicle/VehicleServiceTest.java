@@ -92,4 +92,15 @@ class VehicleServiceTest {
         verify(vehicleRepository, never()).save(any(Vehicle.class));
         assertThat(existing.getQuantity()).isEqualTo(5);
     }
+
+    @Test
+    void throwsWhenVehicleDoesNotExist() {
+        when(vehicleRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> vehicleService.purchase(99L, 1))
+                .isInstanceOf(VehicleNotFoundException.class)
+                .hasMessageContaining("99");
+
+        verify(vehicleRepository, never()).save(any(Vehicle.class));
+    }
 }
