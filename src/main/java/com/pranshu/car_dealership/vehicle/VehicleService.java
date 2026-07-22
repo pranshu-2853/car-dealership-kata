@@ -28,6 +28,13 @@ public class VehicleService {
 
     public Vehicle purchase(Long id, int quantity) {
         Vehicle vehicle = repository.findById(id).orElseThrow();
+
+        if (vehicle.getQuantity() < quantity) {
+            throw new InsufficientStockException(
+                    "Cannot purchase " + quantity + " units of vehicle " + id
+                            + "; only " + vehicle.getQuantity() + " available");
+        }
+
         vehicle.setQuantity(vehicle.getQuantity() - quantity);
         return repository.save(vehicle);
     }
