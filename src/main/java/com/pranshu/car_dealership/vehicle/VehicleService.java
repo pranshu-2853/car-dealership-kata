@@ -27,7 +27,7 @@ public class VehicleService {
     }
 
     public Vehicle purchase(Long id, int quantity) {
-        Vehicle vehicle = repository.findById(id).orElseThrow();
+        Vehicle vehicle = repository.findById(id).orElseThrow(() -> new VehicleNotFoundException(id));
 
         if (vehicle.getQuantity() < quantity) {
             throw new InsufficientStockException(
