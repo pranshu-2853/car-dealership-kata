@@ -103,4 +103,16 @@ class VehicleServiceTest {
 
         verify(vehicleRepository, never()).save(any(Vehicle.class));
     }
+
+    @Test
+    void rejectsNonPositivePurchaseQuantity() {
+        assertThatThrownBy(() -> vehicleService.purchase(1L, 0))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        assertThatThrownBy(() -> vehicleService.purchase(1L, -3))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        verify(vehicleRepository, never()).findById(any());
+        verify(vehicleRepository, never()).save(any(Vehicle.class));
+    }
 }
