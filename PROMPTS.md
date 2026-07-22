@@ -76,6 +76,27 @@ concepts, and reasoning through design decisions before implementation.
 - [Asked for detailed explanation of Mockito's all-or-nothing matcher rule (eq/isNull) and ArgumentCaptor usage for BigDecimal in the search controller test]
 - [Confirmed full test suite green — 10 tests total across VehicleServiceTest, VehicleControllerTest, VehicleRepositoryTest]
 
+### Purchase — full TDD cycle (the feature with real logic)
+
+- [Reviewed plan for Purchase: service-first, happy path before edge cases, custom exception for insufficient stock (409) vs IllegalArgumentException for non-positive quantity (400), separate test for vehicle-not-found (404)]
+- "So the thing I need to remember here is that then answer method will grab the thing that we have passed" → extended to Purchase's ArgumentCaptor usage, confirming why checking the object's untouched state (not just verify(never()).save()) matters — a managed entity could persist via dirty checking even without an explicit save call
+- "why we are not using less than equal to" [asked why the stock guard uses < not <=, confirming that purchasing exactly the remaining stock must succeed]
+- [Caught and corrected two commit-attribution mistakes — initially said "I wrote this by hand" for AI-generated code, corrected both before pushing]
+- [Reviewed VehicleNotFoundException replacing bare orElseThrow(), understanding why a domain-specific exception is needed for @RestControllerAdvice to map cleanly to 404 instead of a generic 500]
+- [Reviewed rejectsNonPositivePurchaseQuantity — asked in detail why quantity <= 0 fails with IllegalArgumentException before findById is even called, and why verify(never()).findById() proves validation-before-database-access ordering]
+- [Confirmed @Transactional added with no dedicated test — corrected own misunderstanding that this was about H2 vs Postgres; clarified it's about VehicleServiceTest mocking the repository entirely with Mockito, which has no real transaction manager to observe]
+- [Reviewed the controller batch: GlobalExceptionHandler (web package, shared across features), ApiError as a record, @Import(GlobalExceptionHandler.class) in @WebMvcTest, and why controller tests assert exact message text while service tests only check message contains key facts]
+- "So we say the service test will handle the business logic... and the controller test will take care of the exact response text" [confirmed understanding of the service-test vs controller-test distinction]
+
+### Restock, Update, Delete — batched given time pressure
+
+- "Today's time is 5 PM... I think we should batch things" [triggered explicit pace change: Restock/Update/Delete get tests+implementation together, no separate RED commit, since they mirror Purchase's already-documented cycle]
+- [Reviewed Restock's asymmetric default — Purchase defaults quantity to 1, Restock requires it explicitly, since a warehouse delivery always has a known count]
+- [Reviewed the findOrThrow/requirePositive refactor extracted from duplication between purchase() and restock() — asked to clarify this was a shared method, not a shared test]
+- [Asked whether a request DTO should be added now, given the id-overwrite risk exposed by updatesAllEditableFieldsButKeepsTheOriginalId — decided to defer, since the service layer already defends against it correctly, and Auth is the higher-priority remaining risk]
+- [Reviewed why delete() uses findOrThrow before repository.delete() rather than deleteById(), since deleteById silently no-ops on a missing id in newer Spring Data]
+- [Confirmed full backend vehicle domain complete — Create, List, Search, Purchase, Restock, Update, Delete all tested and green]
+
 ---
 
 ## Session 2: Implementation (Claude Code, in-repo)
