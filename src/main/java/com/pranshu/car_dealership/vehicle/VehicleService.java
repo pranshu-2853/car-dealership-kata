@@ -25,4 +25,10 @@ public class VehicleService {
                                 BigDecimal minPrice, BigDecimal maxPrice) {
         return repository.search(make, model, category, minPrice, maxPrice);
     }
+
+    public Vehicle purchase(Long id, int quantity) {
+        Vehicle vehicle = repository.findById(id).orElseThrow();
+        vehicle.setQuantity(vehicle.getQuantity() - quantity);
+        return repository.save(vehicle);
+    }
 }
