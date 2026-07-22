@@ -1,5 +1,6 @@
 package com.pranshu.car_dealership.web;
 
+import com.pranshu.car_dealership.auth.UsernameAlreadyExistsException;
 import com.pranshu.car_dealership.vehicle.InsufficientStockException;
 import com.pranshu.car_dealership.vehicle.VehicleNotFoundException;
 
@@ -18,6 +19,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(InsufficientStockException.class)
     public ResponseEntity<ApiError> handleInsufficientStock(InsufficientStockException exception) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ApiError(exception.getMessage()));
+    }
+
+    @ExceptionHandler(UsernameAlreadyExistsException.class)
+    public ResponseEntity<ApiError> handleUsernameAlreadyExists(UsernameAlreadyExistsException exception) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new ApiError(exception.getMessage()));
     }
 

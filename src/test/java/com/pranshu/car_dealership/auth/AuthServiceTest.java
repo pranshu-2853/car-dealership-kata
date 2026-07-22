@@ -1,7 +1,9 @@
 package com.pranshu.car_dealership.auth;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -43,5 +45,16 @@ class AuthServiceTest {
         assertThat(registered.getPassword()).isNotEqualTo("secret123");
         assertThat(passwordEncoder.matches("secret123", registered.getPassword())).isTrue();
         assertThat(registered.getRole()).isEqualTo(Role.USER);
+    }
+
+    @Test
+    void rejectsRegistrationWhenUsernameAlreadyTaken() {
+        when(userRepository.existsByUsername("pranshu")).thenReturn(true);
+
+        assertThatThrownBy(() -> authService.register("pranshu", "secret123"))
+                .isInstanceOf(UsernameAlreadyExistsException.class)
+                .hasMessageContaining("pranshu");
+
+        verify(userRepository, never()).save(any(User.class));
     }
 }

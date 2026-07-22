@@ -15,6 +15,10 @@ public class AuthService {
     }
 
     public User register(String username, String rawPassword) {
+        if (userRepository.existsByUsername(username)) {
+            throw new UsernameAlreadyExistsException(username);
+        }
+
         User user = new User();
         user.setUsername(username);
         user.setPassword(passwordEncoder.encode(rawPassword));
