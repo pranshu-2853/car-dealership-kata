@@ -2,12 +2,15 @@ package com.pranshu.car_dealership.vehicle;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -44,5 +47,27 @@ class VehicleServiceTest {
         assertThat(created.getCategory()).isEqualTo("Sedan");
         assertThat(created.getPrice()).isEqualByComparingTo("1850000.00");
         assertThat(created.getQuantity()).isEqualTo(4);
+    }
+
+    @Test
+    void decreasesQuantityByPurchasedAmount() {
+        Vehicle existing = new Vehicle();
+        existing.setId(1L);
+        existing.setMake("Toyota");
+        existing.setModel("Corolla");
+        existing.setCategory("Sedan");
+        existing.setPrice(new BigDecimal("1850000.00"));
+        existing.setQuantity(5);
+
+        when(vehicleRepository.findById(1L)).thenReturn(Optional.of(existing));
+        when(vehicleRepository.save(any(Vehicle.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Vehicle purchased = vehicleService.purchase(1L, 2);
+
+        assertThat(purchased.getQuantity()).isEqualTo(3);
+
+        ArgumentCaptor<Vehicle> saved = ArgumentCaptor.forClass(Vehicle.class);
+        verify(vehicleRepository).save(saved.capture());
+        assertThat(saved.getValue().getQuantity()).isEqualTo(3);
     }
 }
