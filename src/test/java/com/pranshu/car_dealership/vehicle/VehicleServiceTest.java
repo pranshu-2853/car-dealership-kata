@@ -1,7 +1,9 @@
 package com.pranshu.car_dealership.vehicle;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -69,5 +71,25 @@ class VehicleServiceTest {
         ArgumentCaptor<Vehicle> saved = ArgumentCaptor.forClass(Vehicle.class);
         verify(vehicleRepository).save(saved.capture());
         assertThat(saved.getValue().getQuantity()).isEqualTo(3);
+    }
+
+    @Test
+    void throwsWhenStockIsInsufficient() {
+        Vehicle existing = new Vehicle();
+        existing.setId(1L);
+        existing.setMake("Toyota");
+        existing.setModel("Corolla");
+        existing.setCategory("Sedan");
+        existing.setPrice(new BigDecimal("1850000.00"));
+        existing.setQuantity(5);
+
+        when(vehicleRepository.findById(1L)).thenReturn(Optional.of(existing));
+
+        assertThatThrownBy(() -> vehicleService.purchase(1L, 10))
+                .isInstanceOf(InsufficientStockException.class)
+                .hasMessageContaining("5");
+
+        verify(vehicleRepository, never()).save(any(Vehicle.class));
+        assertThat(existing.getQuantity()).isEqualTo(5);
     }
 }
