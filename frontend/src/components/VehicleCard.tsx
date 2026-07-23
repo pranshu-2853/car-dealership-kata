@@ -30,9 +30,28 @@ interface Props {
   onChanged: () => void | Promise<void>;
 }
 
+/** Coerce free-typed input to a positive integer, falling back to 1 for empty/invalid. */
+function coercePositiveQty(value: string): number {
+  const n = Math.trunc(Number(value));
+  return Number.isFinite(n) && n >= 1 ? n : 1;
+}
+
+/**
+ * Parse to a positive integer, or null when empty/zero/negative/invalid.
+ * Restock has no server-side default (the backend rejects a missing/zero quantity with 400),
+ * so it must NOT fall back to 1 — we block submission and surface a validation error instead.
+ */
+function parsePositiveIntOrNull(value: string): number | null {
+  const trimmed = value.trim();
+  if (trimmed === "") return null;
+  const n = Math.trunc(Number(trimmed));
+  return Number.isFinite(n) && n >= 1 ? n : null;
+}
+
 export default function VehicleCard({ vehicle, isAdmin, onChanged }: Props) {
-  const [purchaseQty, setPurchaseQty] = useState(1);
-  const [restockQty, setRestockQty] = useState(1);
+  const [purchaseQty, setPurchaseQty] = useState("1");
+  const [restockQty, setRestockQty] = useState("1");
+  const [restockError, setRestockError] = useState<string | null>(null);
   const [busy, setBusy] = useState<null | "purchase" | "restock" | "delete">(null);
   const [editOpen, setEditOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -40,11 +59,12 @@ export default function VehicleCard({ vehicle, isAdmin, onChanged }: Props) {
   const outOfStock = vehicle.quantity <= 0;
 
   async function handlePurchase() {
-    if (purchaseQty <= 0) return;
+    const qty = coercePositiveQty(purchaseQty);
+    setPurchaseQty(String(qty));
     setBusy("purchase");
     try {
-      await purchaseVehicle(vehicle.id, purchaseQty);
-      toast.success(`Purchased ${purchaseQty} × ${vehicle.make} ${vehicle.model}`);
+      await purchaseVehicle(vehicle.id, qty);
+      toast.success(`Purchased ${qty} × ${vehicle.make} ${vehicle.model}`);
       await onChanged();
     } catch (e) {
       if (e instanceof ApiError && e.status !== 401 && e.status !== 403) {
@@ -56,14 +76,16 @@ export default function VehicleCard({ vehicle, isAdmin, onChanged }: Props) {
   }
 
   async function handleRestock() {
-    if (restockQty <= 0) {
-      toast.error("Quantity must be positive");
+    const qty = parsePositiveIntOrNull(restockQty);
+    if (qty === null) {
+      setRestockError("Enter a quantity of 1 or more");
       return;
     }
+    setRestockError(null);
     setBusy("restock");
     try {
-      await restockVehicle(vehicle.id, restockQty);
-      toast.success(`Restocked +${restockQty}`);
+      await restockVehicle(vehicle.id, qty);
+      toast.success(`Restocked +${qty}`);
       await onChanged();
     } catch (e) {
       if (e instanceof ApiError && e.status !== 401 && e.status !== 403) {
@@ -127,7 +149,8 @@ export default function VehicleCard({ vehicle, isAdmin, onChanged }: Props) {
               type="number"
               min={1}
               value={purchaseQty}
-              onChange={(e) => setPurchaseQty(Math.max(1, Number(e.target.value) || 1))}
+              onChange={(e) => setPurchaseQty(e.target.value)}
+              onBlur={() => setPurchaseQty(String(coercePositiveQty(purchaseQty)))}
               className="h-10 w-20"
               disabled={outOfStock}
             />
@@ -149,27 +172,35 @@ export default function VehicleCard({ vehicle, isAdmin, onChanged }: Props) {
 
           {isAdmin && (
             <>
-              <div className="flex items-center gap-2">
-                <Input
-                  type="number"
-                  min={1}
-                  required
-                  value={restockQty}
-                  onChange={(e) => setRestockQty(Math.max(1, Number(e.target.value) || 1))}
-                  className="h-10 w-20"
-                />
-                <Button
-                  variant="secondary"
-                  className="flex-1"
-                  onClick={handleRestock}
-                  disabled={busy !== null}
-                >
-                  {busy === "restock" ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    "Restock"
-                  )}
-                </Button>
+              <div>
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="number"
+                    min={1}
+                    value={restockQty}
+                    onChange={(e) => {
+                      setRestockQty(e.target.value);
+                      if (restockError) setRestockError(null);
+                    }}
+                    aria-invalid={restockError !== null}
+                    className="h-10 w-20"
+                  />
+                  <Button
+                    variant="secondary"
+                    className="flex-1"
+                    onClick={handleRestock}
+                    disabled={busy !== null}
+                  >
+                    {busy === "restock" ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      "Restock"
+                    )}
+                  </Button>
+                </div>
+                {restockError && (
+                  <p className="mt-1 text-xs text-destructive">{restockError}</p>
+                )}
               </div>
               <div className="flex gap-2">
                 <Button
