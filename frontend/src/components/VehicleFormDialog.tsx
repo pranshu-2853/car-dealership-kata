@@ -12,13 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  ApiError,
-  createVehicle,
-  updateVehicle,
-  type Vehicle,
-  type VehicleInput,
-} from "@/lib/api";
+import { ApiError, createVehicle, updateVehicle, type Vehicle, type VehicleInput } from "@/lib/api";
 
 interface Props {
   open: boolean;
@@ -29,25 +23,18 @@ interface Props {
 
 const emptyText = { make: "", model: "", category: "" };
 
-/** Price fallback: empty/invalid/negative becomes 0. */
 function coercePrice(value: string): number {
   const n = Number(value);
   return Number.isFinite(n) && n >= 0 ? n : 0;
 }
 
-/** Quantity fallback: empty/invalid becomes 1; a typed 0 is preserved (out-of-stock). */
 function coerceQuantity(value: string): number {
   if (value.trim() === "") return 1;
   const n = Math.trunc(Number(value));
   return Number.isFinite(n) && n >= 0 ? n : 1;
 }
 
-export default function VehicleFormDialog({
-  open,
-  onOpenChange,
-  vehicle,
-  onSaved,
-}: Props) {
+export default function VehicleFormDialog({ open, onOpenChange, vehicle, onSaved }: Props) {
   const editing = !!vehicle;
   const [form, setForm] = useState(emptyText);
   const [priceInput, setPriceInput] = useState("");
@@ -73,9 +60,9 @@ export default function VehicleFormDialog({
       return;
     }
     const payload: VehicleInput = {
-      make: form.make,
-      model: form.model,
-      category: form.category,
+      make: form.make.trim(),
+      model: form.model.trim(),
+      category: form.category.trim(),
       price: coercePrice(priceInput),
       quantity: coerceQuantity(quantityInput),
     };
@@ -101,86 +88,115 @@ export default function VehicleFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-sm">
         <DialogHeader>
-          <DialogTitle>{editing ? "Edit Vehicle" : "Add Vehicle"}</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-base font-semibold">
+            {editing ? "Edit Vehicle" : "Add Vehicle"}
+          </DialogTitle>
+          <DialogDescription className="text-sm text-muted-foreground">
             {editing
               ? "Update the details for this vehicle."
               : "Add a new vehicle to the dealership inventory."}
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={submit} className="space-y-4">
-          <div className="grid gap-2">
-            <Label htmlFor="make">Make</Label>
+
+        <form onSubmit={submit} className="mt-1 space-y-4">
+          {/* Make */}
+          <div className="space-y-1.5">
+            <Label htmlFor="dlg-make" className="text-xs font-medium text-foreground">
+              Make
+            </Label>
             <Input
-              id="make"
+              id="dlg-make"
+              placeholder="e.g. Toyota"
               value={form.make}
               onChange={(e) => setForm({ ...form, make: e.target.value })}
+              className="h-9 text-sm"
               required
             />
           </div>
-          <div className="grid gap-2">
-            <Label htmlFor="model">Model</Label>
+
+          {/* Model */}
+          <div className="space-y-1.5">
+            <Label htmlFor="dlg-model" className="text-xs font-medium text-foreground">
+              Model
+            </Label>
             <Input
-              id="model"
+              id="dlg-model"
+              placeholder="e.g. Corolla"
               value={form.model}
               onChange={(e) => setForm({ ...form, model: e.target.value })}
+              className="h-9 text-sm"
               required
             />
           </div>
-          <div className="grid gap-2">
-            <Label htmlFor="category">Category</Label>
+
+          {/* Category */}
+          <div className="space-y-1.5">
+            <Label htmlFor="dlg-category" className="text-xs font-medium text-foreground">
+              Category
+            </Label>
             <Input
-              id="category"
+              id="dlg-category"
+              placeholder="e.g. Sedan"
               value={form.category}
               onChange={(e) => setForm({ ...form, category: e.target.value })}
+              className="h-9 text-sm"
               required
             />
           </div>
+
+          {/* Price + Quantity */}
           <div className="grid grid-cols-2 gap-3">
-            <div className="grid gap-2">
-              <Label htmlFor="price">Price (₹)</Label>
+            <div className="space-y-1.5">
+              <Label htmlFor="dlg-price" className="text-xs font-medium text-foreground">
+                Price (₹)
+              </Label>
               <Input
-                id="price"
+                id="dlg-price"
                 type="number"
                 step="0.01"
                 min={0}
+                placeholder="0"
                 value={priceInput}
                 onChange={(e) => setPriceInput(e.target.value)}
-                onBlur={() =>
-                  setPriceInput(priceInput.trim() === "" ? "0" : priceInput)
-                }
+                onBlur={() => setPriceInput(priceInput.trim() === "" ? "0" : priceInput)}
+                className="h-9 text-sm"
                 required
               />
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="quantity">Quantity</Label>
+            <div className="space-y-1.5">
+              <Label htmlFor="dlg-quantity" className="text-xs font-medium text-foreground">
+                Quantity
+              </Label>
               <Input
-                id="quantity"
+                id="dlg-quantity"
                 type="number"
                 min={0}
+                placeholder="1"
                 value={quantityInput}
                 onChange={(e) => setQuantityInput(e.target.value)}
-                onBlur={() =>
-                  setQuantityInput(quantityInput.trim() === "" ? "1" : quantityInput)
-                }
+                onBlur={() => setQuantityInput(quantityInput.trim() === "" ? "1" : quantityInput)}
+                className="h-9 text-sm"
                 required
               />
             </div>
           </div>
-          <DialogFooter>
+
+          <DialogFooter className="mt-2 gap-2">
             <Button
               type="button"
               variant="outline"
+              size="sm"
+              className="h-9 text-sm"
               onClick={() => onOpenChange(false)}
               disabled={saving}
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={saving}>
+            <Button type="submit" size="sm" className="h-9 text-sm" disabled={saving}>
               {saving ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
               ) : editing ? (
                 "Save changes"
               ) : (

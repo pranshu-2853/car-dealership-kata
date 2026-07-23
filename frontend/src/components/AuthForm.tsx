@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { Car, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -49,51 +49,77 @@ export default function AuthForm({ mode }: { mode: "login" | "register" }) {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background via-accent/40 to-background px-4 py-12">
-      <div className="w-full max-w-md">
-        <div className="mb-8 flex flex-col items-center text-center">
-          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-lg">
-            <Car className="h-7 w-7" />
+    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+      <div className="w-full max-w-[380px]">
+        {/* Brand */}
+        <div className="mb-8 text-center">
+          <div className="mx-auto mb-4 flex h-9 w-9 items-center justify-center rounded-md border border-border bg-foreground">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="white"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <rect x="1" y="3" width="15" height="13" rx="1" />
+              <path d="M16 8h4l3 5v4h-7V8z" />
+              <circle cx="5.5" cy="18.5" r="2.5" />
+              <circle cx="18.5" cy="18.5" r="2.5" />
+            </svg>
           </div>
-          <h1 className="text-2xl font-bold tracking-tight">AutoVault</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Premium dealership inventory
-          </p>
+          <h1 className="text-lg font-semibold tracking-tight text-foreground">AutoVault</h1>
+          <p className="mt-0.5 text-sm text-muted-foreground">Dealership Inventory System</p>
         </div>
 
-        <div className="rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-8">
-          <h2 className="text-xl font-semibold">
-            {isLogin ? "Sign in" : "Create your account"}
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {isLogin
-              ? "Enter your credentials to access the dashboard."
-              : "Register to start browsing the fleet."}
-          </p>
+        {/* Card */}
+        <div className="rounded-md border border-border bg-card p-7 shadow-sm">
+          <div className="mb-6">
+            <h2 className="text-base font-semibold text-foreground">
+              {isLogin ? "Sign in" : "Create an account"}
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {isLogin
+                ? "Enter your credentials to continue."
+                : "Register to manage vehicle inventory."}
+            </p>
+          </div>
 
-          <form onSubmit={submit} className="mt-6 space-y-4">
-            <div className="grid gap-2">
-              <Label htmlFor="username">Username</Label>
+          <form onSubmit={submit} className="space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="username" className="text-xs font-medium text-foreground">
+                Username
+              </Label>
               <Input
                 id="username"
                 autoComplete="username"
+                placeholder="e.g. john_doe"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
+                className="h-9 text-sm"
               />
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="password">Password</Label>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="password" className="text-xs font-medium text-foreground">
+                Password
+              </Label>
               <Input
                 id="password"
                 type="password"
                 autoComplete={isLogin ? "current-password" : "new-password"}
+                placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                className="h-9 text-sm"
               />
             </div>
-            <Button type="submit" className="w-full" disabled={submitting}>
+
+            <Button type="submit" className="h-9 w-full text-sm font-medium" disabled={submitting}>
               {submitting ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : isLogin ? (
@@ -104,10 +130,10 @@ export default function AuthForm({ mode }: { mode: "login" | "register" }) {
             </Button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-muted-foreground">
+          <p className="mt-5 text-center text-sm text-muted-foreground">
             {isLogin ? (
               <>
-                Don't have an account?{" "}
+                Don&apos;t have an account?{" "}
                 <Link to="/register" className="font-medium text-primary hover:underline">
                   Register
                 </Link>

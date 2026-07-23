@@ -7,7 +7,10 @@ export const Route = createFileRoute("/login")({
       { title: "Sign in — AutoVault" },
       { name: "description", content: "Sign in to the AutoVault dealership inventory system." },
       { property: "og:title", content: "Sign in — AutoVault" },
-      { property: "og:description", content: "Sign in to the AutoVault dealership inventory system." },
+      {
+        property: "og:description",
+        content: "Sign in to the AutoVault dealership inventory system.",
+      },
     ],
   }),
   component: LoginPage,

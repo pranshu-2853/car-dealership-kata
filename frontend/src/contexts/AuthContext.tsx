@@ -8,12 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import { toast } from "sonner";
-import {
-  login as apiLogin,
-  register as apiRegister,
-  setAuthHandlers,
-  type Role,
-} from "@/lib/api";
+import { login as apiLogin, register as apiRegister, setAuthHandlers, type Role } from "@/lib/api";
 
 interface AuthState {
   token: string | null;
@@ -32,8 +27,7 @@ interface AuthContextValue extends AuthState {
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 function readInitial(): AuthState {
-  if (typeof window === "undefined")
-    return { token: null, username: null, role: null };
+  if (typeof window === "undefined") return { token: null, username: null, role: null };
   return {
     token: window.localStorage.getItem("token"),
     username: window.localStorage.getItem("username"),

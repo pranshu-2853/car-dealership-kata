@@ -1,6 +1,5 @@
 const API_BASE_URL =
-  (import.meta.env.VITE_API_BASE_URL as string | undefined) ??
-  "http://localhost:8080";
+  (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? "http://localhost:8080";
 
 export type Role = "USER" | "ADMIN";
 
@@ -83,10 +82,7 @@ async function request<T>(
       headers: finalHeaders,
     });
   } catch (e) {
-    throw new ApiError(
-      "Network error — could not reach the server.",
-      0,
-    );
+    throw new ApiError("Network error — could not reach the server.", 0);
   }
 
   if (res.status === 204) return undefined as T;
@@ -114,8 +110,7 @@ async function request<T>(
     // /api/auth/login and /api/auth/register return 401 for BAD CREDENTIALS, which must
     // surface the real message, not trigger a logout + "Session expired" redirect.
     const isAuthEndpoint =
-      path.startsWith("/api/auth/login") ||
-      path.startsWith("/api/auth/register");
+      path.startsWith("/api/auth/login") || path.startsWith("/api/auth/register");
 
     if (res.status === 401 && !isAuthEndpoint) {
       onUnauthorized?.();
@@ -128,10 +123,7 @@ async function request<T>(
       throw new ApiError(msg, 403);
     }
 
-    throw new ApiError(
-      backendMessage ?? `Request failed (${res.status})`,
-      res.status,
-    );
+    throw new ApiError(backendMessage ?? `Request failed (${res.status})`, res.status);
   }
 
   return body as T;
@@ -139,14 +131,11 @@ async function request<T>(
 
 // --- Auth ---
 export function register(username: string, password: string) {
-  return request<{ id: number; username: string; role: Role }>(
-    "/api/auth/register",
-    {
-      method: "POST",
-      body: JSON.stringify({ username, password }),
-      auth: false,
-    },
-  );
+  return request<{ id: number; username: string; role: Role }>("/api/auth/register", {
+    method: "POST",
+    body: JSON.stringify({ username, password }),
+    auth: false,
+  });
 }
 
 export function login(username: string, password: string) {
@@ -194,17 +183,11 @@ export function deleteVehicle(id: number) {
 }
 
 export function purchaseVehicle(id: number, quantity = 1) {
-  return request<Vehicle>(
-    `/api/vehicles/${id}/purchase?quantity=${quantity}`,
-    { method: "POST" },
-  );
+  return request<Vehicle>(`/api/vehicles/${id}/purchase?quantity=${quantity}`, { method: "POST" });
 }
 
 export function restockVehicle(id: number, quantity: number) {
-  return request<Vehicle>(
-    `/api/vehicles/${id}/restock?quantity=${quantity}`,
-    { method: "POST" },
-  );
+  return request<Vehicle>(`/api/vehicles/${id}/restock?quantity=${quantity}`, { method: "POST" });
 }
 
 export function formatINR(amount: number): string {
