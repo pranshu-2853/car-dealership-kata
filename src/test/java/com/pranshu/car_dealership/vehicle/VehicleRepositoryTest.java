@@ -83,6 +83,18 @@ class VehicleRepositoryTest {
         assertThat(results).hasSize(3);
     }
 
+    @Test
+    void searchIsCaseInsensitive() {
+        entityManager.persist(vehicle("Ford", "Mustang", "Coupe", "5500000.00", 1));
+        entityManager.persist(vehicle("Honda", "City", "Sedan", "1400000.00", 3));
+        entityManager.flush();
+
+        List<Vehicle> results = vehicleRepository.search("ford", null, null, null, null);
+
+        assertThat(results).hasSize(1);
+        assertThat(results).extracting(Vehicle::getMake).containsOnly("Ford");
+    }
+
     private Vehicle vehicle(String make, String model, String category, String price, int quantity) {
         Vehicle vehicle = new Vehicle();
         vehicle.setMake(make);
