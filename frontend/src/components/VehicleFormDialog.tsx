@@ -27,13 +27,20 @@ interface Props {
   onSaved: () => void | Promise<void>;
 }
 
-const empty: VehicleInput = {
-  make: "",
-  model: "",
-  category: "",
-  price: 0,
-  quantity: 0,
-};
+const emptyText = { make: "", model: "", category: "" };
+
+/** Price fallback: empty/invalid/negative becomes 0. */
+function coercePrice(value: string): number {
+  const n = Number(value);
+  return Number.isFinite(n) && n >= 0 ? n : 0;
+}
+
+/** Quantity fallback: empty/invalid becomes 1; a typed 0 is preserved (out-of-stock). */
+function coerceQuantity(value: string): number {
+  if (value.trim() === "") return 1;
+  const n = Math.trunc(Number(value));
+  return Number.isFinite(n) && n >= 0 ? n : 1;
+}
 
 export default function VehicleFormDialog({
   open,
@@ -42,22 +49,20 @@ export default function VehicleFormDialog({
   onSaved,
 }: Props) {
   const editing = !!vehicle;
-  const [form, setForm] = useState<VehicleInput>(empty);
+  const [form, setForm] = useState(emptyText);
+  const [priceInput, setPriceInput] = useState("");
+  const [quantityInput, setQuantityInput] = useState("");
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (open) {
       setForm(
         vehicle
-          ? {
-              make: vehicle.make,
-              model: vehicle.model,
-              category: vehicle.category,
-              price: vehicle.price,
-              quantity: vehicle.quantity,
-            }
-          : empty,
+          ? { make: vehicle.make, model: vehicle.model, category: vehicle.category }
+          : emptyText,
       );
+      setPriceInput(vehicle ? String(vehicle.price) : "");
+      setQuantityInput(vehicle ? String(vehicle.quantity) : "");
     }
   }, [open, vehicle]);
 
@@ -67,13 +72,20 @@ export default function VehicleFormDialog({
       toast.error("Make, model and category are required");
       return;
     }
+    const payload: VehicleInput = {
+      make: form.make,
+      model: form.model,
+      category: form.category,
+      price: coercePrice(priceInput),
+      quantity: coerceQuantity(quantityInput),
+    };
     setSaving(true);
     try {
       if (editing && vehicle) {
-        await updateVehicle(vehicle.id, form);
+        await updateVehicle(vehicle.id, payload);
         toast.success("Vehicle updated");
       } else {
-        await createVehicle(form);
+        await createVehicle(payload);
         toast.success("Vehicle added");
       }
       onOpenChange(false);
@@ -134,8 +146,11 @@ export default function VehicleFormDialog({
                 type="number"
                 step="0.01"
                 min={0}
-                value={form.price}
-                onChange={(e) => setForm({ ...form, price: Number(e.target.value) })}
+                value={priceInput}
+                onChange={(e) => setPriceInput(e.target.value)}
+                onBlur={() =>
+                  setPriceInput(priceInput.trim() === "" ? "0" : priceInput)
+                }
                 required
               />
             </div>
@@ -145,9 +160,10 @@ export default function VehicleFormDialog({
                 id="quantity"
                 type="number"
                 min={0}
-                value={form.quantity}
-                onChange={(e) =>
-                  setForm({ ...form, quantity: Number(e.target.value) })
+                value={quantityInput}
+                onChange={(e) => setQuantityInput(e.target.value)}
+                onBlur={() =>
+                  setQuantityInput(quantityInput.trim() === "" ? "1" : quantityInput)
                 }
                 required
               />
