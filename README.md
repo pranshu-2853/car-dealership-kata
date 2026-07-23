@@ -334,23 +334,29 @@ deployment must set `JWT_SECRET` and `ADMIN_PASSWORD` in the environment.
 
 <!-- SCREENSHOT 1: the login page -->
 ### Login
-![Login page](screenshots/login.png)
+<img width="790" height="776" alt="Login_SS" src="https://github.com/user-attachments/assets/4214236c-e8c1-4e25-a7fa-4a6557a78369" />
+
 
 <!-- SCREENSHOT 2: dashboard logged in as admin, showing Add Vehicle + Edit/Delete/Restock on cards -->
 ### Dashboard — Admin view
-![Admin dashboard](screenshots/dashboard-admin.png)
+<img width="1902" height="1027" alt="Admin_view_SS" src="https://github.com/user-attachments/assets/8d94a362-440a-41d0-adb0-0f1427316874" />
+
 
 <!-- SCREENSHOT 3: dashboard logged in as a regular USER — no admin controls visible -->
 ### Dashboard — User view
-![User dashboard](screenshots/dashboard-user.png)
+<img width="1897" height="1027" alt="User_SS" src="https://github.com/user-attachments/assets/f3cefbc3-8a52-4bde-975c-f6e9eca8bd84" />
+
 
 <!-- SCREENSHOT 4: search panel with filters filled in and results showing -->
 ### Search & Filter
-![Search](screenshots/search.png)
+<img width="1732" height="682" alt="Filter_SS" src="https://github.com/user-attachments/assets/3a8c48dc-8585-4c3f-9757-2d2830c5ed7f" />
+
 
 <!-- SCREENSHOT 5: the Add/Edit vehicle modal open -->
 ### Add / Edit Vehicle
-![Vehicle form](screenshots/vehicle-form.png)
+<img width="477" height="556" alt="Add_SS" src="https://github.com/user-attachments/assets/341aa295-e84f-45e5-b0e9-94a10ed5fe0d" />
+<img width="480" height="552" alt="Edit_SS" src="https://github.com/user-attachments/assets/da5fb7bd-5016-4df7-a262-dfa1e4d41546" />
+
 
 ---
 
@@ -379,7 +385,8 @@ Report generated at `backend/target/site/jacoco/index.html`.
 | application entry point | 37% |
 
 <!-- SCREENSHOT 6: the JaCoCo HTML report table -->
-![JaCoCo coverage report](screenshots/jacoco.png)
+<img width="1901" height="305" alt="Jacoco_SS" src="https://github.com/user-attachments/assets/f9dc1f20-21dc-42a5-a718-69b656871998" />
+
 
 `config` and the application entry point show lower coverage because they consist of bean
 wiring and the `main` method — code with no meaningful branches to test.
