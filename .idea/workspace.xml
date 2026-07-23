@@ -5,47 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="efb64d9c-80a1-45df-bcb0-66a5646234dd" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitattributes" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CLAUDE.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/PROMPTS.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mvnw" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mvnw.cmd" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/pranshu/car_dealership/CarDealershipApplication.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/pranshu/car_dealership/auth/AppUserDetailsService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/pranshu/car_dealership/auth/AuthController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/pranshu/car_dealership/auth/AuthDtos.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/pranshu/car_dealership/auth/AuthService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/pranshu/car_dealership/auth/InvalidCredentialsException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/pranshu/car_dealership/auth/JwtAuthenticationFilter.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/pranshu/car_dealership/auth/JwtService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/pranshu/car_dealership/auth/Role.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/pranshu/car_dealership/auth/User.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/pranshu/car_dealership/auth/UserRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/pranshu/car_dealership/auth/UsernameAlreadyExistsException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/pranshu/car_dealership/config/AdminSeeder.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/pranshu/car_dealership/config/SecurityConfig.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/pranshu/car_dealership/vehicle/InsufficientStockException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/pranshu/car_dealership/vehicle/Vehicle.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/pranshu/car_dealership/vehicle/VehicleController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/pranshu/car_dealership/vehicle/VehicleNotFoundException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/pranshu/car_dealership/vehicle/VehicleRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/pranshu/car_dealership/vehicle/VehicleService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/pranshu/car_dealership/web/ApiError.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/pranshu/car_dealership/web/GlobalExceptionHandler.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application.yaml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/pranshu/car_dealership/CarDealershipApplicationTests.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/pranshu/car_dealership/auth/AuthControllerTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/pranshu/car_dealership/auth/AuthServiceTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/pranshu/car_dealership/auth/JwtServiceTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/pranshu/car_dealership/security/SecurityErrorDispatchIntegrationTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/pranshu/car_dealership/security/SecurityIntegrationTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/pranshu/car_dealership/vehicle/VehicleControllerTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/pranshu/car_dealership/vehicle/VehicleRepositoryTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/pranshu/car_dealership/vehicle/VehicleServiceTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/resources/application.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/PROMPTS.md" beforeDir="false" afterPath="$PROJECT_DIR$/backend/PROMPTS.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -137,7 +98,7 @@
       <workItem from="1784784921330" duration="12103000" />
       <workItem from="1784802405956" duration="2024000" />
       <workItem from="1784804646309" duration="6043000" />
-      <workItem from="1784813458379" duration="1904000" />
+      <workItem from="1784813458379" duration="4616000" />
     </task>
     <servers />
   </component>
