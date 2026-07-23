@@ -102,18 +102,36 @@ async function request<T>(
   }
 
   if (!res.ok) {
-    const message =
-      (body && (body.message || body.error)) || `Request failed (${res.status})`;
+    // The backend's GlobalExceptionHandler returns { "message": ... } for the errors it
+    // handles (400/401-bad-creds/404/409). Prefer that; fall back to a generic string only
+    // when it's absent (e.g. Spring Security's 403, which bypasses our handler).
+    const backendMessage: string | undefined =
+      body && typeof body.message === "string" && body.message.trim() !== ""
+        ? body.message
+        : undefined;
 
-    if (res.status === 401) {
+    // Only a 401 from a PROTECTED endpoint means the session/token expired -> log out.
+    // /api/auth/login and /api/auth/register return 401 for BAD CREDENTIALS, which must
+    // surface the real message, not trigger a logout + "Session expired" redirect.
+    const isAuthEndpoint =
+      path.startsWith("/api/auth/login") ||
+      path.startsWith("/api/auth/register");
+
+    if (res.status === 401 && !isAuthEndpoint) {
       onUnauthorized?.();
       throw new ApiError("Session expired. Please log in again.", 401);
     }
+
     if (res.status === 403) {
-      onForbidden?.("You do not have permission to do this");
-      throw new ApiError("You do not have permission to do this", 403);
+      const msg = backendMessage ?? "You do not have permission to do this";
+      onForbidden?.(msg);
+      throw new ApiError(msg, 403);
     }
-    throw new ApiError(message, res.status);
+
+    throw new ApiError(
+      backendMessage ?? `Request failed (${res.status})`,
+      res.status,
+    );
   }
 
   return body as T;
