@@ -3,6 +3,10 @@ spring:
     name: car-dealership
 
 app:
+  seed-admin:
+    enabled: true
+    username: ${ADMIN_USERNAME:admin}
+    password: ${ADMIN_PASSWORD:admin123}
   cors:
     allowed-origins: http://localhost:5173
   jwt:
