@@ -9,18 +9,23 @@ import org.springframework.data.repository.query.Param;
 
 public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
 
-    // CAST(:param AS ...) is required for PostgreSQL. A blank filter is bound as an
-    // untyped null; Postgres infers parameter types at parse time and cannot type a bare
-    // ":param IS NULL", so the whole statement fails with "could not determine data type
-    // of parameter". An explicit HQL cast gives every occurrence a concrete type. H2 never
-    // hit this because it tolerates untyped-null inference, which is why the H2 test passed.
+    // The casts below are required for PostgreSQL; H2 tolerates untyped nulls, which is
+    // why the H2 test never caught either issue. A blank filter is bound as a null with no
+    // type, and Postgres surfaces it two ways:
+    //   1) Parse time: a bare ":param IS NULL" cannot be typed -> "could not determine data
+    //      type of parameter". An explicit cast on every occurrence gives it a concrete type.
+    //   2) Execution time: the driver sends the null as an unspecified binary the server
+    //      treats as bytea. "bytea -> varchar" is legal, so the String params are fine, but
+    //      "bytea -> numeric" is NOT ("cannot cast type bytea to numeric"). Routing the
+    //      numeric params through text first (bytea -> varchar -> numeric) is legal, hence
+    //      the nested CAST(CAST(:param AS String) AS BigDecimal).
     @Query("""
             SELECT v FROM Vehicle v
             WHERE (CAST(:make AS String) IS NULL OR LOWER(v.make) = LOWER(CAST(:make AS String)))
               AND (CAST(:model AS String) IS NULL OR LOWER(v.model) = LOWER(CAST(:model AS String)))
               AND (CAST(:category AS String) IS NULL OR LOWER(v.category) = LOWER(CAST(:category AS String)))
-              AND (CAST(:minPrice AS BigDecimal) IS NULL OR v.price >= CAST(:minPrice AS BigDecimal))
-              AND (CAST(:maxPrice AS BigDecimal) IS NULL OR v.price <= CAST(:maxPrice AS BigDecimal))
+              AND (CAST(CAST(:minPrice AS String) AS BigDecimal) IS NULL OR v.price >= CAST(CAST(:minPrice AS String) AS BigDecimal))
+              AND (CAST(CAST(:maxPrice AS String) AS BigDecimal) IS NULL OR v.price <= CAST(CAST(:maxPrice AS String) AS BigDecimal))
             """)
     List<Vehicle> search(@Param("make") String make,
                          @Param("model") String model,
